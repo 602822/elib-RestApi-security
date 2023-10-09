@@ -6,6 +6,8 @@ package no.hvl.dat152.rest.ws.service;
 import java.util.List;
 
 import java.time.LocalDate;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +39,12 @@ public class OrderService {
 	
 	public void deleteOrder(Long id) throws OrderNotFoundException, UnauthorizedOrderActionException {
 
-		// TODO
+		Optional<Order> order = orderRepository.findById(id);
+		if(order.isEmpty()) {
+			throw new OrderNotFoundException("Order with id: " + id + "could not be found");
+		}
+		orderRepository.delete(order.get());
+
 	}
 	
 	public List<Order> findAllOrders(){
@@ -58,17 +65,26 @@ public class OrderService {
 	}
 	
 	public Order updateOrder(Order order, Long id) throws OrderNotFoundException, UnauthorizedOrderActionException {
-		 
-		// TODO
-		
-		return null;		
+
+		Optional<Order> orderFromRepo = orderRepository.findById(id);
+
+		if (orderFromRepo.isEmpty()) {
+			throw new OrderNotFoundException("Order with id: " + id + " could not be found");
+		}
+
+		order.setId(id);
+		orderRepository.save(order);
+
+
+		return order;
 	}
 	
 	public List<Order> findByExpiryDate(LocalDate expiry, Pageable page){
-		
-		// TODO
-		
-		return null;
+
+		Page<Order> orders = orderRepository.findByExpiryBefore(expiry, page);
+
+
+		return orders.getContent();
 	}
 	
 	private boolean verifyPrincipalOfOrder(Long id) throws UnauthorizedOrderActionException {

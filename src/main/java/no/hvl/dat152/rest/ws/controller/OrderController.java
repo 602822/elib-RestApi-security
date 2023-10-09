@@ -53,8 +53,9 @@ public class OrderController {
 	 * @return ResponseEntity<Object>
 	 */
 
-	// TODO authority annotation
+
 	@GetMapping("/orders")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Object> getAllBorrowOrders(
 			@RequestParam(required = false) LocalDate expiry,
 			@RequestParam(defaultValue = "0") int page,
@@ -72,7 +73,7 @@ public class OrderController {
 	}
 	
 	@GetMapping("/orders/{id}")
-	// TODO authority annotation
+	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> getBorrowOrder(@PathVariable("id") Long id) 
 			throws OrderNotFoundException, UnauthorizedOrderActionException{
 		
@@ -87,7 +88,6 @@ public class OrderController {
 	}
 	
 	@PutMapping("/orders/{id}")
-	// TODO authority annotation
 	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> updateOrder(@PathVariable("id") Long id, @RequestBody Order order) 
 			throws OrderNotFoundException, UserNotFoundException, UnauthorizedOrderActionException{
@@ -100,8 +100,7 @@ public class OrderController {
 	}
 	
 	@DeleteMapping("/orders/{id}")
-
-	// TODO authority annotation
+	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> returnBookOrder(@PathVariable("id") Long id) throws OrderNotFoundException {
 		try {
 			orderService.deleteOrder(id);
