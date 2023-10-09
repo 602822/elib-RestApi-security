@@ -42,5 +42,14 @@ public class AuthorController {
 		return new ResponseEntity<>(author, HttpStatus.OK);		
 	}
 
+	@GetMapping("/authors")
+	public ResponseEntity<Object> getAuthors() {
+		List<Author> authors = authorService.findAll();
+		if (authors.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		return new ResponseEntity<>(authors, HttpStatus.OK);
+	}
+
 
 }

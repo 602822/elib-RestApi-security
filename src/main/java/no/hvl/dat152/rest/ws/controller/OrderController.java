@@ -52,16 +52,23 @@ public class OrderController {
 	 * @param size (# of record to fetch)
 	 * @return ResponseEntity<Object>
 	 */
-	@GetMapping("/orders")
+
 	// TODO authority annotation
+	@GetMapping("/orders")
 	public ResponseEntity<Object> getAllBorrowOrders(
-			@RequestParam(required = false) LocalDate expiry, 
+			@RequestParam(required = false) LocalDate expiry,
 			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "3") int size){
-		
-		// TODO
-		
-		return null;
+			@RequestParam(defaultValue = "3") int size) {
+
+		List<Order> orders = new ArrayList<>();
+		Pageable paging = PageRequest.of(page, size);
+
+		orders = orderService.findByExpiryDate(expiry, paging);
+		if (!orders.isEmpty()) {
+			return new ResponseEntity<>(orders, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
 	}
 	
 	@GetMapping("/orders/{id}")
@@ -81,6 +88,7 @@ public class OrderController {
 	
 	@PutMapping("/orders/{id}")
 	// TODO authority annotation
+	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> updateOrder(@PathVariable("id") Long id, @RequestBody Order order) 
 			throws OrderNotFoundException, UserNotFoundException, UnauthorizedOrderActionException{
 
@@ -92,13 +100,15 @@ public class OrderController {
 	}
 	
 	@DeleteMapping("/orders/{id}")
+
 	// TODO authority annotation
-	public ResponseEntity<Object> returnBookOrder(@PathVariable("id") Long id) 
-			throws OrderNotFoundException, UnauthorizedOrderActionException{
-		
-		// TODO
-		
-		return null;
+	public ResponseEntity<Object> returnBookOrder(@PathVariable("id") Long id) throws OrderNotFoundException {
+		try {
+			orderService.deleteOrder(id);
+			return new ResponseEntity<>("Order with id: '" + id + "' deleted!", HttpStatus.OK);
+		} catch (OrderNotFoundException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
 	}
 	
 }

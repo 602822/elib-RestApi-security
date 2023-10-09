@@ -22,12 +22,13 @@ public class AuthorService {
 
 	@Autowired
 	private AuthorRepository authorRepository;
-	
-	
+
+
 	public Author saveAuthor(Author author) {
-		
-		// TODO
-		return null;
+
+		author = authorRepository.save(author);
+
+		return author;
 	}
 	
 	public Author findById(long id) throws AuthorNotFoundException {
@@ -36,6 +37,10 @@ public class AuthorService {
 				.orElseThrow(()-> new AuthorNotFoundException("Author with the id: "+id+ "not found!"));
 		
 		return author;
+	}
+
+	public List<Author> findAll() {
+		return(List<Author>) authorRepository.findAll();
 	}
 
 }

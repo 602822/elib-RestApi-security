@@ -86,14 +86,19 @@ public class UserController {
 		return new ResponseEntity<>(orders, HttpStatus.OK);
 	}
 	
-	@PostMapping("/users/{id}/orders")
+
 	// TODO authority annotation
-	public ResponseEntity<Object> createUserOrders(@PathVariable("id") Long id, @RequestBody Order order) 
-			throws UserNotFoundException, OrderNotFoundException, UnauthorizedOrderActionException{
-		
-		// TODO
-		
-		return null;
+	@PostMapping("/users/{id}/orders")
+	public ResponseEntity<Object> createUserOrders(@PathVariable("id") Long id, @RequestBody Order order)
+			throws UserNotFoundException, OrderNotFoundException {
+
+		try {
+			User user = userService.createOrdersForUser(id, order); // Legger til ein ny order for ein bruker
+			addLinks(userService.findOrdersForUser(id)); // Legger til HATEAOS lenkene
+			return new ResponseEntity<>(user, HttpStatus.CREATED);
+		} catch (UserNotFoundException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
 	}
 	
 	private void addLinks(Set<Order> orders) throws OrderNotFoundException, UnauthorizedOrderActionException {
