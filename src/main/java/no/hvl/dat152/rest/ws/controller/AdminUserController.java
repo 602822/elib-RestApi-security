@@ -56,8 +56,7 @@ public class AdminUserController {
 
         try {
 
-            userService.deleteUserRole(id, role);
-            User user = userService.findUser(id);
+            User user = userService.deleteUserRole(id, role);
 
             return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (UserNotFoundException e) {

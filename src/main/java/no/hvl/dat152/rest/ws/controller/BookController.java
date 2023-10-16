@@ -88,9 +88,12 @@ public class BookController {
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Book> createBook(@RequestBody Book book){
 		
-		Book nbook = bookService.saveBook(book);
+		bookService.saveBook(book);
 		
-		return new ResponseEntity<>(nbook, HttpStatus.CREATED);
+		return new ResponseEntity<>(book, HttpStatus.CREATED);
+
+
+
 	}
 	
 	@PutMapping("/books/{isbn}")

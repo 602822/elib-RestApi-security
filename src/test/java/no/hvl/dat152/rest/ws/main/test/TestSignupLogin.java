@@ -46,8 +46,8 @@ class TestSignupLogin {
 	public void BloginUser_thenOK() throws UserNotFoundException {
 		
 		AuthRequest authReq = new AuthRequest();
-		authReq.setEmail("berit@email.com");
-		authReq.setPassword("berit_pwd");	
+		authReq.setEmail("robert@email.com");
+		authReq.setPassword("robert_pwd");
 		
 		Response response = RestAssured.given()
 				.contentType(MediaType.APPLICATION_JSON_VALUE)

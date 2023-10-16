@@ -34,10 +34,10 @@ class TestBook {
 	private AuthorService authorService;
 
 	private String API_ROOT = "http://localhost:8090/elibrary/api/v1";
-	
-	@Value("${super.admin.token}") 
+
+	@Value("${super.admin.token}")
 	private String SUPER_ADMIN_TOKEN;
-	
+
 	@Value("${user.token}")
 	private String USER_TOKEN;
 	

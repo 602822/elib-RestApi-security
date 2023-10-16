@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package no.hvl.dat152.rest.ws.controller;
 
@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -34,81 +35,86 @@ import no.hvl.dat152.rest.ws.service.UserService;
 @RequestMapping("/elibrary/api/v1")
 public class UserController {
 
-	@Autowired
-	private UserService userService;
-	
-	@GetMapping("/users")
-	// TODO authority annotation
-	public ResponseEntity<Object> getUsers(){
-		
-		List<User> users = userService.findAllUsers();
-		
-		if(users.isEmpty())
-			
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		else
-			return new ResponseEntity<>(users, HttpStatus.OK);
-	}
-	
-	@GetMapping(value = "/users/{id}")
-	// TODO authority annotation
-	public ResponseEntity<Object> getUser(@PathVariable("id") Long id) 
-			throws UserNotFoundException, OrderNotFoundException, UnauthorizedOrderActionException{
-		
-		User user = null;
-		try {
-			user = userService.findUser(id);
-			addLinks(user.getOrders());
-			
-			return new ResponseEntity<>(user, HttpStatus.OK);
-			
-		}catch(UserNotFoundException e) {
-			
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	
-	@DeleteMapping("/users/{id}")
-	// TODO authority annotation
-	public ResponseEntity<Object> deleteUser(@PathVariable("id") Long id) throws UserNotFoundException{
-		
-		userService.deleteUser(id);
-		
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
-	
-	@GetMapping("/users/{id}/orders")
-	// TODO authority annotation
-	public ResponseEntity<Object> getUserOrders(@PathVariable("id") Long id) throws UserNotFoundException{
-		
-		Set<Order> orders = userService.findOrdersForUser(id);
-		
-		return new ResponseEntity<>(orders, HttpStatus.OK);
-	}
-	
+    @Autowired
+    private UserService userService;
 
-	// TODO authority annotation
-	@PostMapping("/users/{id}/orders")
-	public ResponseEntity<Object> createUserOrders(@PathVariable("id") Long id, @RequestBody Order order)
-			throws UserNotFoundException, OrderNotFoundException {
+    @GetMapping("/users")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Object> getUsers() {
 
-		try {
-			User user = userService.createOrdersForUser(id, order); // Legger til ein ny order for ein bruker
-			addLinks(userService.findOrdersForUser(id)); // Legger til HATEAOS lenkene
-			return new ResponseEntity<>(user, HttpStatus.CREATED);
-		} catch (UserNotFoundException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		}
-	}
-	
-	private void addLinks(Set<Order> orders) throws OrderNotFoundException, UnauthorizedOrderActionException {
-		
-		for(Order order : orders) {
-			Link rordersLink = linkTo(methodOn(OrderController.class)
-					.returnBookOrder(order.getId()))
-					.withRel("Update_Return_or_Cancel");
-			order.add(rordersLink);
-		}
-	}
-	
+        List<User> users = userService.findAllUsers();
+
+        if (users.isEmpty())
+
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        else
+            return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/users/{id}")
+    // TODO authority annotation
+    public ResponseEntity<Object> getUser(@PathVariable("id") Long id)
+            throws UserNotFoundException, OrderNotFoundException, UnauthorizedOrderActionException {
+
+        User user = null;
+        try {
+            user = userService.findUser(id);
+            addLinks(user.getOrders());
+
+            return new ResponseEntity<>(user, HttpStatus.OK);
+
+        } catch (UserNotFoundException e) {
+
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/users/{id}")
+    // TODO authority annotation
+    public ResponseEntity<Object> deleteUser(@PathVariable("id") Long id) throws UserNotFoundException {
+
+        try {
+            userService.deleteUser(id);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return  new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @GetMapping("/users/{id}/orders")
+    // TODO authority annotation
+    public ResponseEntity<Object> getUserOrders(@PathVariable("id") Long id) throws UserNotFoundException {
+
+        Set<Order> orders = userService.findOrdersForUser(id);
+
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
+
+    // TODO authority annotation
+    @PostMapping("/users/{id}/orders")
+    public ResponseEntity<Object> createUserOrders(@PathVariable("id") Long id, @RequestBody Order order)
+            throws UserNotFoundException, OrderNotFoundException {
+
+        try {
+            User user = userService.createOrdersForUser(id, order); // Legger til ein ny order for ein bruker
+            addLinks(userService.findOrdersForUser(id)); // Legger til HATEAOS lenkene
+            return new ResponseEntity<>(user, HttpStatus.CREATED);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    private void addLinks(Set<Order> orders) throws OrderNotFoundException, UnauthorizedOrderActionException {
+
+        for (Order order : orders) {
+            Link rordersLink = linkTo(methodOn(OrderController.class)
+                    .returnBookOrder(order.getId()))
+                    .withRel("Update_Return_or_Cancel");
+            order.add(rordersLink);
+        }
+    }
+
 }

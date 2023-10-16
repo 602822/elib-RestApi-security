@@ -64,7 +64,7 @@ public class OrderController {
 		List<Order> orders = new ArrayList<>();
 		Pageable paging = PageRequest.of(page, size);
 
-		orders = orderService.findByExpiryDate(expiry, paging);
+		orders = orderService.findAllPaginate(paging);
 		if (!orders.isEmpty()) {
 			return new ResponseEntity<>(orders, HttpStatus.OK);
 		}
@@ -109,5 +109,7 @@ public class OrderController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
+
+
 	
 }

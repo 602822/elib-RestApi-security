@@ -8,6 +8,7 @@ import java.util.List;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import no.hvl.dat152.rest.ws.model.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +55,12 @@ public class OrderService {
 		return orders;
 	}
 
+	public List<Order> findAllPaginate(Pageable page) {
+
+		Page<Order> orders = orderRepository.findAll(page);
+
+		return orders.getContent();
+	}
 	
 	public Order findOrder(Long id) throws OrderNotFoundException, UnauthorizedOrderActionException {
 		
